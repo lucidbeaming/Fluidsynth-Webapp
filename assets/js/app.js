@@ -1,4 +1,5 @@
-var socket = io.connect('http://gix.local:7000');
+var server = self.location.host;
+var socket = io.connect('http://' + server);
 var instruments;
 $(document).on('vclick', '#instruments li a', function(){  
 	var ipath = $(this).attr('data-inum');
