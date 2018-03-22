@@ -47,6 +47,7 @@ function telnetConnect(){
   console.log("Fluidsynth Telnet: connecting...");
   tconnect.connect(tparams).then(function () {
     console.log("Fluidsynth Telnet: connection success");
+    io.emit('status','connected');
   });
 }
 io.on('connection', function(client) {
