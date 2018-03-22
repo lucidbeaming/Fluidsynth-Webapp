@@ -5,6 +5,7 @@ var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var telnet = require('telnet-client');
 var tconnect = new telnet();
+var config = require('./config');
 
 app.use(express.static(__dirname + '/node_modules'));
 app.use(express.static(__dirname + '/assets'));
@@ -14,10 +15,10 @@ app.get('/', function(req, res,next) {
 });
 
 var tparams = {
-  host: '192.168.1.10',
-  port: 9800,
+  host: config.FLUIDSYNTH_HOST,
+  port: config.FLUIDSYNTH_PORT,
   shellPrompt: '/ # ',
-  timeout: 1500,
+  timeout: config.FLUIDSYNTH_TIMEOUT,
   // removeEcho: 4
 };
 
