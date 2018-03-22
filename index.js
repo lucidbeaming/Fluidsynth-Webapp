@@ -23,8 +23,8 @@ var tparams = {
 };
 
 
-function changeinst(inst) {
-    var flcmd = 'prog 0 ' + inst;
+function changeinst(channel,inst) {
+    var flcmd = 'prog '+channel+' ' + inst;
     console.log("fluidsynth: ", flcmd);
     tconnect.send(flcmd, function(err, response) {
        // console.log(response);
@@ -44,10 +44,12 @@ function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 function telnetConnect(){
-  console.log("Fluidsynth Telnet: connecting...");
+  console.log("Fluidsynth Telnet: connecting to "+tparams.host+":"+tparams.port+"... ");
   tconnect.connect(tparams).then(function () {
     console.log("Fluidsynth Telnet: connection success");
     io.emit('status','connected');
+  }).catch(function (error){
+    throw error;
   });
 }
 io.on('connection', function(client) {
@@ -58,10 +60,14 @@ io.on('connection', function(client) {
       console.error("Fluidsynth Telnet: connection failed, retrying in 5 seconds...");
       setTimeout(telnetConnect, 5000);
     });
-
-    client.on('message', function(data) {
-        if (isNumeric(data)) {
-		      changeinst(data);
+    tconnect.send('inst 1', function(err, ins) {
+        client.emit('instrumentdump', { package: ins });
+    });
+    client.on('changeinst', function(data) {
+      var channel = data.split(',')[0];
+      var inst = data.split(',')[1];
+        if (isNumeric(channel) && isNumeric(inst)) {
+		      changeinst(channel,inst);
         } else if (data == "list") {
           tconnect.send('channels', function(err, ins) {
             io.emit('current', { package: ins });
