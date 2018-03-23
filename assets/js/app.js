@@ -27,6 +27,9 @@ socket.on('connect', function(data) {
 		$("#instruments").listview("refresh");
 		$.mobile.loading( 'hide');
 	});
+  socket.on('voices', function(voices){
+    $("voiceNumber").text(voices);
+  });
 });
 socket.on('reconnecting', function() {
     $.mobile.loading( 'show', { text: 'finding fluid', textVisible: true });

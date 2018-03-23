@@ -45,21 +45,31 @@ function isNumeric(n) {
 }
 function telnetConnect(){
   console.log("Fluidsynth Telnet: connecting to "+tparams.host+":"+tparams.port+"... ");
+
   tconnect.connect(tparams).then(function () {
     console.log("Fluidsynth Telnet: connection success");
     io.emit('status','connected');
   }).catch(function (error){
-    throw error;
+
+    console.error("Fluidsynth Telnet: connection failed, retrying in 5 seconds...");
+  });
+
+    // setTimeout(telnetConnect, 5000);
+
+}
+
+function getvoices(client) {
+  tconnect.send('voice_count', function (data) {
+    var voices = data.split(': ')[1];
+    client.emit('voices', voices);
+    setTimeout(getvoices, config.STATUS_UPDATE_INTERVAL);
   });
 }
+
 io.on('connection', function(client) {
     console.log('server connected');
     telnetConnect();
 
-    tconnect.on('error', function (err) {
-      console.error("Fluidsynth Telnet: connection failed, retrying in 5 seconds...");
-      setTimeout(telnetConnect, 5000);
-    });
     tconnect.send('inst 1', function(err, ins) {
         client.emit('instrumentdump', { package: ins });
     });
@@ -73,9 +83,11 @@ io.on('connection', function(client) {
             io.emit('current', { package: ins });
           });
         } else {
-		      //console.log(data);
+		      console.log(data);
         }
     });
+    getvoices(client);
+
 });
 io.on('error', function(error) {
   console.log(error);
