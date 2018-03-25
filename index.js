@@ -39,23 +39,18 @@ function currentinstruments() {
       console.log(current);
       io.emit('message', { cord: current })
 }
-
+var connectRetry = null;
 function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 function telnetConnect(){
+  clearTimeout(connectRetry);
   console.log("Fluidsynth Telnet: connecting to "+tparams.host+":"+tparams.port+"... ");
 
   tconnect.connect(tparams).then(function () {
     console.log("Fluidsynth Telnet: connection success");
     io.emit('status','connected');
-  }).catch(function (error){
-
-    console.error("Fluidsynth Telnet: connection failed, retrying in 5 seconds...");
   });
-
-    // setTimeout(telnetConnect, 5000);
-
 }
 
 function getvoices(client) {
@@ -69,6 +64,11 @@ function getvoices(client) {
 io.on('connection', function(client) {
     console.log('server connected');
     telnetConnect();
+
+    tconnect.on('error', function () {
+      console.error("Fluidsynth Telnet: connection failed, retrying in "+ (config.FLUIDSYNTH_RETRY / 1000) +" seconds...");
+      connectRetry = setTimeout(telnetConnect, config.FLUIDSYNTH_RETRY);
+    });
 
     tconnect.send('inst 1', function(err, ins) {
         client.emit('instrumentdump', { package: ins });
@@ -86,7 +86,7 @@ io.on('connection', function(client) {
 		      console.log(data);
         }
     });
-    getvoices(client);
+    // getvoices(client);
 
 });
 io.on('error', function(error) {

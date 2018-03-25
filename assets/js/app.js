@@ -4,7 +4,7 @@ var instruments;
 $(document).on('vclick', '#instruments li a', function(){
 	var ipath = $(this).attr('data-inum');
 	var iname = $(this).text();
-	var channel = 15;
+	var channel = 0;
 	console.log(iname + ': ' + ipath);
 	socket.emit('changeinst', channel+","+ipath);
 	console.log(channel);
