@@ -23,8 +23,8 @@ var tparams = {
 };
 
 
-function changeinst(channel,inst) {
-    var flcmd = 'prog '+channel+' ' + inst;
+function changeinst(channel,inst,fontId, bank) {
+    var flcmd = 'select '+channel+' '+ fontId + ' ' + bank + ' ' + inst;
     console.log("fluidsynth: ", flcmd);
     tconnect.send(flcmd, function(err, response) {
        // console.log(response);
@@ -60,7 +60,11 @@ function getvoices(client) {
     setTimeout(getvoices, config.STATUS_UPDATE_INTERVAL);
   });
 }
-
+function dumpInstruments(font,client){
+  tconnect.send('inst '+font, function(err, ins) {
+    client.emit('instrumentdump', { package: ins });
+  });
+}
 io.on('connection', function(client) {
     console.log('server connected');
     telnetConnect();
@@ -69,17 +73,19 @@ io.on('connection', function(client) {
       console.error("Fluidsynth Telnet: connection failed, retrying in "+ (config.FLUIDSYNTH_RETRY / 1000) +" seconds...");
       connectRetry = setTimeout(telnetConnect, config.FLUIDSYNTH_RETRY);
     });
-
-    tconnect.send('inst 1', function(err, ins) {
-        client.emit('instrumentdump', { package: ins });
+    client.on('queryFont',function(font){
+      if (isNumeric(font)){
+        dumpInstruments(font,client);
+      }
     });
     client.on('changeinst', function(data) {
       
       var channel = data.channel;
       var inst = data.instrumentId;
+      var fontId = data.fontId;
 
       if (isNumeric(channel) && isNumeric(inst)) {
-        changeinst(channel,inst);
+        changeinst(channel,inst,fontId,0);
       } else if (data == "list") {
         tconnect.send('channels', function(err, ins) {
           io.emit('current', { package: ins });
