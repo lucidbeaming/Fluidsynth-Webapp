@@ -74,17 +74,19 @@ io.on('connection', function(client) {
         client.emit('instrumentdump', { package: ins });
     });
     client.on('changeinst', function(data) {
-      var channel = data.split(',')[0];
-      var inst = data.split(',')[1];
-        if (isNumeric(channel) && isNumeric(inst)) {
-		      changeinst(channel,inst);
-        } else if (data == "list") {
-          tconnect.send('channels', function(err, ins) {
-            io.emit('current', { package: ins });
-          });
-        } else {
-		      console.log(data);
-        }
+      
+      var channel = data.channel;
+      var inst = data.instrumentId;
+
+      if (isNumeric(channel) && isNumeric(inst)) {
+        changeinst(channel,inst);
+      } else if (data == "list") {
+        tconnect.send('channels', function(err, ins) {
+          io.emit('current', { package: ins });
+        });
+      } else {
+        console.log(data);
+      }
     });
     // getvoices(client);
 

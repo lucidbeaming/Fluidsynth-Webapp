@@ -4,3 +4,4 @@ package-lock.json
 npm-debug.log
 run.sh
 .nvmrc
+.vscode

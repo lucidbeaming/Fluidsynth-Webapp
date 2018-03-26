@@ -5,8 +5,7 @@ $(document).on('vclick', '#instruments li a', function(){
 	var ipath = $(this).attr('data-inum');
 	var iname = $(this).text();
 	var channel = 0;
-	console.log(iname + ': ' + ipath);
-	socket.emit('changeinst', channel+","+ipath);
+	socket.emit('changeinst', { channel: channel, instrumentId: ipath });
 	console.log(channel);
 	console.log(ipath);
 	$('#instruments li a').removeClass('ui-btn-active');
@@ -16,6 +15,7 @@ socket.on('connect', function(data) {
 	$.mobile.loading( 'show', { text: 'pouring fluid', textVisible: true });
 	socket.emit('status', 'client connected');
 	socket.on('instrumentdump', function(idmp){
+		$('#instruments').html("");
 		var str = idmp.package;
 		var instruments = str.split("\n");
 		for (i=0;i < instruments.length; i++) {
