@@ -86,13 +86,17 @@ io.on('connection', function(client) {
 
       if (isNumeric(channel) && isNumeric(inst)) {
         changeinst(channel,inst,fontId,0);
-      } else if (data == "list") {
+      } 
+    });
+    client.on('getinstruments', function(){
         tconnect.send('channels', function(err, ins) {
-          io.emit('current', { package: ins });
+	  var raw_list = ins.split("\n");
+	  var channel_list = [];
+	  for (i=0; i < raw_list.length - 1; i++){
+	    channel_list[i] = raw_list[i].split(", ")[1].trim();
+	  }
+          io.emit('current', { channels: channel_list });
         });
-      } else {
-        console.log(data);
-      }
     });
     // getvoices(client);
 

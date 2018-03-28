@@ -38,9 +38,9 @@ socket.on('reconnecting', function() {
     $.mobile.loading( 'show', { text: 'finding fluid', textVisible: true });
 })
 function getinstruments(){
-	socket.emit('message', 'list');
-	socket.on('current', function(icur){
-		instruments = icur.package;
+	socket.emit('getinstruments');
+	socket.on('current', function(data){
+		instruments = data.channels;
 		console.log(instruments);
 	});
 }
