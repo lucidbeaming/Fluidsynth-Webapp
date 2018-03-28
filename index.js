@@ -52,12 +52,13 @@ function telnetConnect(){
     io.emit('status','connected');
   });
 }
-
+var voices;
 function getvoices(client) {
+  clearTimeout(voices);
   tconnect.send('voice_count', function (data) {
     var voices = data.split(': ')[1];
     client.emit('voices', voices);
-    setTimeout(getvoices, config.STATUS_UPDATE_INTERVAL);
+    voices = setTimeout(getvoices, config.STATUS_UPDATE_INTERVAL);
   });
 }
 function dumpInstruments(font,client){
@@ -73,25 +74,36 @@ io.on('connection', function(client) {
       console.error("Fluidsynth Telnet: connection failed, retrying in "+ (config.FLUIDSYNTH_RETRY / 1000) +" seconds...");
       connectRetry = setTimeout(telnetConnect, config.FLUIDSYNTH_RETRY);
     });
+
     client.on('queryFont',function(font){
+
       if (isNumeric(font)){
         dumpInstruments(font,client);
       }
+
     });
+
     client.on('changeinst', function(data) {
       
       var channel = data.channel;
       var inst = data.instrumentId;
       var fontId = data.fontId;
+      var bankId = data.bankId;
 
-      if (isNumeric(channel) && isNumeric(inst)) {
-        changeinst(channel,inst,fontId,0);
+      if ( isNumeric(channel) && isNumeric(inst) ) {
+
+        changeinst(channel,inst,fontId,bankId);
+
       } else if (data == "list") {
+
         tconnect.send('channels', function(err, ins) {
           io.emit('current', { package: ins });
         });
+
       } else {
+
         console.log(data);
+
       }
     });
     // getvoices(client);
