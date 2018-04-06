@@ -93,9 +93,6 @@ io.on('connection', function(client) {
       if ( isNumeric(channel) && isNumeric(inst) ) {
 
         changeinst(channel,inst,fontId,bankId);
-
-      if (isNumeric(channel) && isNumeric(inst)) {
-        changeinst(channel,inst,fontId,0);
       } 
     });
     client.on('getinstruments', function(){
