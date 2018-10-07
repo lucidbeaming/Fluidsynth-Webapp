@@ -4,7 +4,8 @@
   "description": "frontend for fluidsynth",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "keywords": [
     "fluidsynth",
@@ -16,5 +17,8 @@
     "express": "^4.15.2",
     "socket.io": "^1.7.3",
     "telnet-client": "^0.13.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.17.2"
   }
 }
