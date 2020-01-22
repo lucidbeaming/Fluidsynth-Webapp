@@ -60,8 +60,8 @@ function getInstruments(){
 				+ instrumentname 
 				+ '</a></li>').enhanceWithin();
 		}
-		$("#instruments").listview("refresh");
-		$.mobile.loading( 'hide');
+                $('#instruments').listview().listview('refresh');
+ 		$.mobile.loading( 'hide');
 	});
 }
 $(document).on('vclick', '#instruments li a', function(){
