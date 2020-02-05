@@ -60,7 +60,11 @@ function getInstruments(){
 				+ instrumentname 
 				+ '</a></li>').enhanceWithin();
 		}
-		$("#instruments").listview("refresh");
+		try {
+		    $('#instruments').listview('refresh');
+		} catch(e) {
+		     $('#instruments').listview();
+		}
 		$.mobile.loading( 'hide');
 	});
 }
