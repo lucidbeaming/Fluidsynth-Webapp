@@ -56,8 +56,10 @@ function changeinst(channel,inst,fontId, bank) {
     command('select '+channel+' '+ fontId + ' ' + bank + ' ' + inst);
 }
 
-function isNumeric(n) {
-  return !isNaN(parseFloat(n)) && isFinite(n);
+// Values from the browser end up in a FluidSynth shell command, so only
+// plain non-negative integers ("1", "040") are allowed through.
+function isIndex(n) {
+  return /^\d{1,5}$/.test(String(n));
 }
 
 function scheduleReconnect() {
@@ -104,7 +106,7 @@ io.on('connection', function(client) {
 
     client.on('queryFont',function(font){
 
-      if (isNumeric(font)){
+      if (isIndex(font)){
         dumpInstruments(font,client);
       }
 
@@ -117,10 +119,12 @@ io.on('connection', function(client) {
       var fontId = data.fontId;
       var bankId = data.bankId;
 
-      if ( isNumeric(channel) && isNumeric(inst) ) {
+      if ( isIndex(channel) && isIndex(inst) && isIndex(fontId) && isIndex(bankId) ) {
 
         changeinst(channel,inst,fontId,bankId);
-      } 
+      } else {
+        console.error('changeinst: rejected invalid request', JSON.stringify(data));
+      }
     });
     client.on('getinstruments', function(){
         query('channels', function(ins) {
