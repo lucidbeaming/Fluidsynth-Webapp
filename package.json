@@ -3,9 +3,13 @@
   "version": "0.9.0",
   "description": "frontend for fluidsynth",
   "main": "index.js",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "keywords": [
     "fluidsynth",
@@ -14,11 +18,11 @@
   "author": "lucidbeaming",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.15.2",
+    "express": "^5.3.0",
     "socket.io": "^4.8.4",
     "telnet-client": "^2.2.14"
   },
   "devDependencies": {
-    "nodemon": "^1.17.2"
+    "nodemon": "^3.1.14"
   }
 }
