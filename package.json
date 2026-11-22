@@ -16,7 +16,7 @@
   "dependencies": {
     "express": "^4.15.2",
     "socket.io": "^4.8.4",
-    "telnet-client": "^0.13.1"
+    "telnet-client": "^2.2.14"
   },
   "devDependencies": {
     "nodemon": "^1.17.2"

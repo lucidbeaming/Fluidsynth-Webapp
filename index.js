@@ -4,8 +4,7 @@ var app = express();
 var server = require('http').createServer(app);
 const { Server } = require('socket.io');
 const io = new Server(server);
-var telnet = require('telnet-client');
-var tconnect = new telnet();
+const { Telnet } = require('telnet-client');
 var config = require('./config');
 
 app.use(express.static(__dirname + '/node_modules'));
@@ -15,66 +14,94 @@ app.get('/', function(req, res,next) {
     res.sendFile(__dirname + '/index.html');
 });
 
+// FluidSynth's server shell (fluidsynth -s) has no prompt and doesn't do
+// telnet negotiation, so treat it as a plain TCP line protocol.
 var tparams = {
   host: config.FLUIDSYNTH_HOST,
   port: config.FLUIDSYNTH_PORT,
-  shellPrompt: '/ # ',
+  negotiationMandatory: false,
   timeout: config.FLUIDSYNTH_TIMEOUT,
-  // removeEcho: 4
+  // Responses have no end marker: send() collects output for this long
+  sendTimeout: config.FLUIDSYNTH_RESPONSE_WAIT
 };
 
+var fluid = null;
+var connected = false;
+var connectRetry = null;
+
+// For commands that print nothing (select). send() and write() would wait
+// for output and reject with "response not received", so write to the socket.
+function command(cmd) {
+  var socket = fluid && fluid.getSocket();
+  if (!connected || !socket) {
+    console.error("Fluidsynth: not connected, dropped: " + cmd);
+    return;
+  }
+  console.log("fluidsynth: ", cmd);
+  socket.write(cmd + '\n');
+}
+
+// For commands that print a listing (inst, channels). Failures are logged
+// and answered with an empty listing instead of rejecting.
+function query(cmd, done) {
+  if (!connected) {
+    return done('');
+  }
+  fluid.send(cmd).then(done, function(err) {
+    console.error('Fluidsynth: "' + cmd + '" failed: ' + err.message);
+    done('');
+  });
+}
 
 function changeinst(channel,inst,fontId, bank) {
-    var flcmd = 'select '+channel+' '+ fontId + ' ' + bank + ' ' + inst;
-    console.log("fluidsynth: ", flcmd);
-    tconnect.send(flcmd, function(err, response) {
-       // console.log(response);
-    });
+    command('select '+channel+' '+ fontId + ' ' + bank + ' ' + inst);
 }
 
-function currentinstruments() {
-      var current;
-      tconnect.send('channels', function(err, chans) {
-            current=chans;
-      });
-      console.log(current);
-      io.emit('message', { cord: current })
-}
-var connectRetry = null;
 function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
+
+function scheduleReconnect() {
+  connected = false;
+  clearTimeout(connectRetry);
+  connectRetry = setTimeout(telnetConnect, config.FLUIDSYNTH_RETRY);
+}
+
+// One connection for the whole server, opened at startup and reopened if it
+// drops (previously every browser connection opened another one).
 function telnetConnect(){
   clearTimeout(connectRetry);
   console.log("Fluidsynth Telnet: connecting to "+tparams.host+":"+tparams.port+"... ");
 
-  tconnect.connect(tparams).then(function () {
+  fluid = new Telnet();
+  fluid.on('error', function (err) {
+    console.error("Fluidsynth Telnet: " + err.message);
+  });
+  fluid.on('close', function () {
+    if (connected) {
+      console.error("Fluidsynth Telnet: connection closed, retrying in "+ (config.FLUIDSYNTH_RETRY / 1000) +" seconds...");
+      scheduleReconnect();
+    }
+  });
+
+  fluid.connect(tparams).then(function () {
+    connected = true;
     console.log("Fluidsynth Telnet: connection success");
     io.emit('status','connected');
+  }, function () {
+    console.error("Fluidsynth Telnet: connection failed, retrying in "+ (config.FLUIDSYNTH_RETRY / 1000) +" seconds...");
+    scheduleReconnect();
   });
 }
-var voices;
-function getvoices(client) {
-  clearTimeout(voices);
-  tconnect.send('voice_count', function (data) {
-    var voices = data.split(': ')[1];
-    client.emit('voices', voices);
-    voices = setTimeout(getvoices, config.STATUS_UPDATE_INTERVAL);
-  });
-}
+
 function dumpInstruments(font,client){
-  tconnect.send('inst '+font, function(err, ins) {
+  query('inst '+font, function(ins) {
     client.emit('instrumentdump', { package: ins });
   });
 }
+
 io.on('connection', function(client) {
     console.log('server connected');
-    telnetConnect();
-
-    tconnect.on('error', function () {
-      console.error("Fluidsynth Telnet: connection failed, retrying in "+ (config.FLUIDSYNTH_RETRY / 1000) +" seconds...");
-      connectRetry = setTimeout(telnetConnect, config.FLUIDSYNTH_RETRY);
-    });
 
     client.on('queryFont',function(font){
 
@@ -97,19 +124,20 @@ io.on('connection', function(client) {
       } 
     });
     client.on('getinstruments', function(){
-        tconnect.send('channels', function(err, ins) {
+        query('channels', function(ins) {
 	  var raw_list = ins.split("\n");
 	  var channel_list = [];
-	  for (i=0; i < raw_list.length - 1; i++){
+	  for (var i=0; i < raw_list.length - 1; i++){
 	    channel_list[i] = raw_list[i].split(", ")[1].trim();
 	  }
           io.emit('current', { channels: channel_list });
         });
     });
-    // getvoices(client);
 
 });
 io.on('error', function(error) {
   console.log(error);
 });
+
+telnetConnect();
 server.listen(7000);
