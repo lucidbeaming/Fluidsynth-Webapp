@@ -7,7 +7,6 @@ const io = new Server(server);
 const { Telnet } = require('telnet-client');
 var config = require('./config');
 
-app.use(express.static(__dirname + '/node_modules'));
 app.use(express.static(__dirname + '/assets'));
 
 app.get('/', function(req, res,next) {
