@@ -14,12 +14,18 @@ socket.io.on('reconnect_attempt', function() {
     $.mobile.loading( 'show', { text: 'finding fluid', textVisible: true });
 })
 
+// Register each handler once; the functions below only send requests.
+// (Registering them inside those functions added another listener on every
+// reconnect and hash change.)
+socket.on('current', function(data){
+	instruments = data.channels;
+	console.log(instruments);
+});
+
+socket.on('instrumentdump', renderInstruments);
+
 function getChannels(){
 	socket.emit('getinstruments');
-	socket.on('current', function(data){
-		instruments = data.channels;
-		console.log(instruments);
-	});
 }
 
 function getInstruments(){
@@ -35,11 +41,11 @@ function getInstruments(){
 	$.mobile.loading( 'show', { text: 'pouring fluid', textVisible: true });
 	socket.emit('status', 'client connected');
 
-	var fontId = listFont;
+	socket.emit('queryFont', listFont);
+}
 
-	socket.emit('queryFont', fontId);
-
-	socket.on('instrumentdump', function(idmp){
+function renderInstruments(idmp){
+		var fontId = listFont;
 
 		$('#instruments').html("");
 		var str = idmp.package;
@@ -67,7 +73,6 @@ function getInstruments(){
 		     $('#instruments').listview();
 		}
 		$.mobile.loading( 'hide');
-	});
 }
 $(document).on('vclick', '#instruments li a', function(){
 	var ipath = $(this).attr('data-inum');
