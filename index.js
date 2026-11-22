@@ -140,4 +140,6 @@ io.on('error', function(error) {
 });
 
 telnetConnect();
-server.listen(7000);
+server.listen(config.PORT, function () {
+  console.log('Fluidsynth web app on port ' + config.PORT);
+});
