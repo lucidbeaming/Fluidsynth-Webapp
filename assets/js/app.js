@@ -1,5 +1,5 @@
-var server = self.location.host;
-var socket = io.connect('http://' + server);
+// Connect back to whichever host and scheme served the page (works over HTTPS too)
+var socket = io();
 var instruments;
 
 var channel = 15;
@@ -9,16 +9,23 @@ socket.on('connect', getInstruments);
 
 window.onhashchange = getInstruments;
 
-socket.on('reconnecting', function() {
+// socket.io 3+ moved reconnection events from the socket to its manager
+socket.io.on('reconnect_attempt', function() {
     $.mobile.loading( 'show', { text: 'finding fluid', textVisible: true });
 })
 
+// Register each handler once; the functions below only send requests.
+// (Registering them inside those functions added another listener on every
+// reconnect and hash change.)
+socket.on('current', function(data){
+	instruments = data.channels;
+	console.log(instruments);
+});
+
+socket.on('instrumentdump', renderInstruments);
+
 function getChannels(){
 	socket.emit('getinstruments');
-	socket.on('current', function(data){
-		instruments = data.channels;
-		console.log(instruments);
-	});
 }
 
 function getInstruments(){
@@ -34,11 +41,11 @@ function getInstruments(){
 	$.mobile.loading( 'show', { text: 'pouring fluid', textVisible: true });
 	socket.emit('status', 'client connected');
 
-	var fontId = listFont;
+	socket.emit('queryFont', listFont);
+}
 
-	socket.emit('queryFont', fontId);
-
-	socket.on('instrumentdump', function(idmp){
+function renderInstruments(idmp){
+		var fontId = listFont;
 
 		$('#instruments').html("");
 		var str = idmp.package;
@@ -66,7 +73,6 @@ function getInstruments(){
 		     $('#instruments').listview();
 		}
 		$.mobile.loading( 'hide');
-	});
 }
 $(document).on('vclick', '#instruments li a', function(){
 	var ipath = $(this).attr('data-inum');
