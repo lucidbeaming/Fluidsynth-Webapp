@@ -2,7 +2,8 @@
 var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
-var io = require('socket.io')(server);
+const { Server } = require('socket.io');
+const io = new Server(server);
 var telnet = require('telnet-client');
 var tconnect = new telnet();
 var config = require('./config');

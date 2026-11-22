@@ -15,7 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.15.2",
-    "socket.io": "~> 2.4.0",
+    "socket.io": "^4.8.4",
     "telnet-client": "^0.13.1"
   },
   "devDependencies": {

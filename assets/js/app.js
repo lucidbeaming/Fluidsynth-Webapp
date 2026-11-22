@@ -1,5 +1,5 @@
-var server = self.location.host;
-var socket = io.connect('http://' + server);
+// Connect back to whichever host and scheme served the page (works over HTTPS too)
+var socket = io();
 var instruments;
 
 var channel = 15;
@@ -9,7 +9,8 @@ socket.on('connect', getInstruments);
 
 window.onhashchange = getInstruments;
 
-socket.on('reconnecting', function() {
+// socket.io 3+ moved reconnection events from the socket to its manager
+socket.io.on('reconnect_attempt', function() {
     $.mobile.loading( 'show', { text: 'finding fluid', textVisible: true });
 })
 
