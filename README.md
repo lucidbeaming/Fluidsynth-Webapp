@@ -76,11 +76,6 @@ Most keyboards send on MIDI channel 1, so open the page with `#c=0` to change wh
 - Channel, SoundFont, bank and program values from the browser must be plain non-negative integers before they're put into a `select` command, so a browser can't send arbitrary shell commands.
 - The page itself ([`index.html`](index.html), [`assets/js/app.js`](assets/js/app.js)) uses jQuery Mobile 1.4.5 with jQuery 1.11.1.
 
-## Credits
-
-- [Israel Medina](https://github.com/imedina7): the channel and SoundFont URL parameters, channel status and FluidSynth message refactors, and stability fixes (2018)
-- [njkeng](https://github.com/njkeng): a list view fix (2020)
-
 ## Related projects
 
 - [ZynAddSubFX-WebApp](https://github.com/lucidbeaming/ZynAddSubFX-WebApp): the same idea for the ZynAddSubFX synth, over OSC
@@ -89,4 +84,4 @@ Most keyboards send on MIDI channel 1, so open the page with `#c=0` to change wh
 
 ## License
 
-This repository doesn't have a license yet. It includes code from the contributors above, and a license needs their agreement.
+This repository doesn't have a license yet. It includes code from other contributors, and a license needs their agreement.
