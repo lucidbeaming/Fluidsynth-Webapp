@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-11-23
+
+The Raspberry Pi FluidSynth web controller, renewed. **Breaking:** socket.io 4 on both server and browser (socket.io 2 clients can't connect), and Node 20+ is required. Instrument changes no longer wait for a response FluidSynth never sends, clients can no longer send arbitrary FluidSynth shell commands, and the README covers setup end to end.
+
 ### Changed
 - README rewritten: starting FluidSynth with its shell server, install, configuration, the `#c=`/`&f=` URL parameters (the channel defaults to MIDI channel 16), and how it works (#10)
 - Repository metadata (#8)
@@ -26,3 +30,6 @@ All notable changes to this project are documented here. The format follows [Kee
 ### Removed
 - Serving `node_modules` over HTTP (#4)
 - Unused `currentinstruments()` / `getvoices()` and the `STATUS_UPDATE_INTERVAL` setting (#4)
+
+[Unreleased]: https://github.com/lucidbeaming/Fluidsynth-Webapp/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/lucidbeaming/Fluidsynth-Webapp/compare/v1.0.0...v2.0.0
