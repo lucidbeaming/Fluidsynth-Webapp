@@ -5,6 +5,8 @@ All notable changes to this project are documented here. The format follows [Kee
 ## [Unreleased]
 
 ### Changed
+- Repository metadata (#8)
+- Package metadata: `repository`, `bugs` and `homepage` in `package.json` (#8)
 - socket.io 2.x → 4.x on the server and the browser client. The client connects with `io()` to the page's own origin, so it also works over HTTPS (#4)
 - telnet-client 0.13 → 2.x. FluidSynth's shell is now treated as a plain TCP line protocol (no prompt, no telnet negotiation). One shared connection is opened at startup and reopened when FluidSynth restarts (#4)
 - express 4 → 5 and nodemon 1 → 3; new `npm run dev`; `engines.node` is `>=20` (#4)
