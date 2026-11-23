@@ -5,6 +5,7 @@ All notable changes to this project are documented here. The format follows [Kee
 ## [Unreleased]
 
 ### Changed
+- README rewritten: starting FluidSynth with its shell server, install, configuration, the `#c=`/`&f=` URL parameters (the channel defaults to MIDI channel 16), and how it works (#10)
 - Repository metadata (#8)
 - Package metadata: `repository`, `bugs` and `homepage` in `package.json` (#8)
 - socket.io 2.x → 4.x on the server and the browser client. The client connects with `io()` to the page's own origin, so it also works over HTTPS (#4)
