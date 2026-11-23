@@ -84,4 +84,4 @@ Most keyboards send on MIDI channel 1, so open the page with `#c=0` to change wh
 
 ## License
 
-This repository doesn't have a license yet. It includes code from other contributors, and a license needs their agreement.
+[MIT](LICENSE).

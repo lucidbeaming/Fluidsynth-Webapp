@@ -16,7 +16,7 @@
     "web"
   ],
   "author": "lucidbeaming",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "express": "^5.3.0",
     "socket.io": "^4.8.4",

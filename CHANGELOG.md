@@ -14,6 +14,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - `package-lock.json` is committed (#4)
 
 ### Added
+- MIT license (#12)
 - `PORT` setting for the web app (default 7000; macOS uses 7000 for AirPlay Receiver) (#4)
 - `FLUIDSYNTH_RESPONSE_WAIT` setting: how long to collect a listing from FluidSynth (default 500 ms) (#4)
 
