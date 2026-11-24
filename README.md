@@ -2,6 +2,8 @@
 
 Node web app for controlling FluidSynth over its telnet shell.
 
+Documentation: [lucidbeaming.com/art/code/fluidsynth-webapp](https://lucidbeaming.com/art/code/fluidsynth-webapp)
+
 **Build write-up:** [Running Fluidsynth on a Raspberry Pi Zero W](https://lucidbeaming.com/blog/running-fluidsynth-on-a-raspberry-pi-zero-w/)
 
 [FluidSynth](https://www.fluidsynth.org/) plays SoundFonts (`.sf2`): sets of sampled instruments, including recreations of 70s–90s synths. This app was built for a tiny standalone synth: a Raspberry Pi Zero W running FluidSynth headless, played from a USB MIDI keyboard, running about six hours on a USB battery pack, with no screen. Open the app on a phone and it lists every instrument in the loaded SoundFont; tap one to switch the synth to it.
